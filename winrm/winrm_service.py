@@ -47,8 +47,7 @@ class WinRMWebService(object):
         Operation timeout, see http://msdn.microsoft.com/en-us/library/ee916629(v=PROT.13).aspx
         @param int seconds: the number of seconds to set the timeout to. It will be converted to an ISO8601 format.
         """
-        # in original library there is an alias - op_timeout method
-        return duration_isoformat(timedelta(seconds))
+        self.timeout = "PT%fS" % seconds
 
     def open_shell(self, i_stream='stdin', o_stream='stdout stderr', working_directory=None, env_vars=None, noprofile=False, codepage=437, lifetime=None, idle_timeout=None):
         """

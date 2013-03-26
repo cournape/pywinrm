@@ -1,6 +1,9 @@
 import sys
+import time
 import base64
-from winrm.exceptions import WinRMTransportError
+from winrm.exceptions import WinRMTransportError, WinRMTimeout
+
+from winrm.soap_provider import parse_fault
 
 HAVE_KERBEROS=False
 try:
@@ -74,10 +77,13 @@ class HttpPlaintext(HttpTransport):
             #return doc
             #return doc
         except HTTPError as ex:
-            error_message = 'Bad HTTP response returned from server. Code {0}'.format(ex.code)
-            if ex.msg:
-                error_message += ', {0}'.format(ex.msg)
-            raise WinRMTransportError(error_message)
+            if ex.code == 500:
+                raise parse_fault(ex.read())
+            else:
+                error_message = 'Bad HTTP response returned from server. Code {0}'.format(ex.code)
+                if ex.msg:
+                    error_message += ', {0}'.format(ex.msg)
+                raise WinRMTransportError(error_message)
         except URLError as ex:
             raise WinRMTransportError(ex.reason)
 
